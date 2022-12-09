@@ -13,7 +13,7 @@ const useFetch = (url) => {
             fetch(url, { signal: abortCont.signal })
                 .then(res => {
                     if (!res.ok) {
-                        throw Error("Filed to fatch data from server");
+                        throw Error(res.statusText)
                     }
                     return res.json();
                 })
