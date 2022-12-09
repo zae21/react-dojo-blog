@@ -1,10 +1,12 @@
 import { useState } from "react";
+import { useHistory } from "react-router-dom";
 
 const Create = () => {
     const [title, setTitle] = useState('');
     const [body, setBody] = useState('');
     const [author, setAuthor] = useState('mario');
     const [isLoading, setIsLoading] = useState(false)
+    const history = useHistory();
 
     const onSubmitHandle = (e) => {
         e.preventDefault();
@@ -22,6 +24,7 @@ const Create = () => {
         }).then(d=>{
             console.log(d);
             setIsLoading(false);
+            history.push(`/blog/${d.id}`);
         }).catch(e => {
             console.log(e);
             setIsLoading(false);
