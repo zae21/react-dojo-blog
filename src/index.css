@@ -70,6 +70,15 @@
   border-radius: 8px;
   cursor: pointer;
 }
+.blog-detail a {
+  background: #6d35f1;
+  text-decoration: none;
+  color: #fff;
+  margin-left: 5px;
+  border: 0;
+  padding: 6px;
+  border-radius: 8px;
+}
 
 /* create new blog form */
 .create {

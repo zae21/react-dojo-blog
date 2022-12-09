@@ -19,10 +19,16 @@
       "id": 3
     },
     {
-      "title": "asfaefe",
-      "body": "dfsdcer",
+      "title": "new blog title",
+      "body": "edit from previous blog data",
       "author": "yoshi",
       "id": 6
+    },
+    {
+      "title": "scond blog today",
+      "body": "the body from second blog today",
+      "author": "luigi",
+      "id": 7
     }
   ]
 }

@@ -3,6 +3,7 @@ import Navbar from './components/Navbar'
 import Home from './components/Home'
 import Create from './components/Create';
 import BlogDetail from './components/BlogDetail';
+import NotFound from './components/NotFound';
 
 function App() {
   return (
@@ -19,6 +20,12 @@ function App() {
             </Route>
             <Route path="/blog/:id">
               <BlogDetail />
+            </Route>
+            <Route path="/update/:id">
+              <Create />
+            </Route>
+            <Route path="*">
+              <NotFound />
             </Route>
           </Switch>
         </div>

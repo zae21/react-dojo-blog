@@ -1,13 +1,32 @@
-import { useState } from "react";
-import { useHistory } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useHistory, useParams } from "react-router-dom";
 
 const Create = () => {
-    const [title, setTitle] = useState('');
-    const [body, setBody] = useState('');
+    const { id } = useParams();
+    const [title, setTitle] = useState("");
+    const [body, setBody] = useState("");
     const [author, setAuthor] = useState('mario');
-    const [isLoading, setIsLoading] = useState(false)
+    const [isLoading, setIsLoading] = useState(false);
     const history = useHistory();
 
+    useEffect(() => {
+        fetch(`http://localhost:8000/blogs/${id}`)
+            .then(res => {
+                if (!res.ok) {
+                    throw Error(res.statusText)
+                }
+                return res.json();
+            })
+            .then(data => {
+                setTitle(data.title);
+                setBody(data.body);
+                setAuthor(data.author);
+            })
+            .catch(err => {
+                console.log(err.message);
+            });
+    }, []);
+    
     const onSubmitHandle = (e) => {
         e.preventDefault();
 
@@ -15,13 +34,13 @@ const Create = () => {
 
         setIsLoading(true);
 
-        fetch("http://localhost:8000/blogs",{
-            method: "POST",
-            headers: { "Content-Type" : "application/json" },
+        fetch(id !== undefined ? `http://localhost:8000/blogs/${id}` : "http://localhost:8000/blogs", {
+            method: id !== undefined ? "PUT" : "POST",
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(blog)
         }).then(r => {
             return r.json();
-        }).then(d=>{
+        }).then(d => {
             console.log(d);
             setIsLoading(false);
             history.push(`/blog/${d.id}`);
@@ -48,7 +67,7 @@ const Create = () => {
                 {
                     !isLoading ? <button>Add blog</button> : <button disabled>Saving blog ...</button>
                 }
-                
+
             </form>
         </div>
     );
