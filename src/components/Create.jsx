@@ -1,53 +1,38 @@
 import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useHistory, useParams } from "react-router-dom";
+import { fetchData, createData } from "../stores/blogs";
 
 const Create = () => {
     const { id } = useParams();
-    const [title, setTitle] = useState("");
-    const [body, setBody] = useState("");
-    const [author, setAuthor] = useState('mario');
-    const [isLoading, setIsLoading] = useState(false);
+    const dispatch = useDispatch();
+
+    const { isLoading, blogs } = useSelector((state) => state.blogs);
+    useEffect(() => {
+        if (id !== undefined) {
+            dispatch(fetchData(id));
+        }else{
+            setTitle("");
+            setBody("");
+            setAuthor("mario");
+        }
+    }, [dispatch]);
+
+    const [title, setTitle] = useState((blogs && blogs.title) ?? "");
+    const [body, setBody] = useState((blogs && blogs.body) ?? "");
+    const [author, setAuthor] = useState((blogs && blogs.author) ?? 'mario');
+    const [isCreateLoading, setIsCreateLoading] = useState(isLoading);
+
     const history = useHistory();
 
-    useEffect(() => {
-        fetch(`http://localhost:8000/blogs/${id}`)
-            .then(res => {
-                if (!res.ok) {
-                    throw Error(res.statusText)
-                }
-                return res.json();
-            })
-            .then(data => {
-                setTitle(data.title);
-                setBody(data.body);
-                setAuthor(data.author);
-            })
-            .catch(err => {
-                console.log(err.message);
-            });
-    }, []);
-    
     const onSubmitHandle = (e) => {
         e.preventDefault();
 
         const blog = { title, body, author };
 
-        setIsLoading(true);
-
-        fetch(id !== undefined ? `http://localhost:8000/blogs/${id}` : "http://localhost:8000/blogs", {
-            method: id !== undefined ? "PUT" : "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(blog)
-        }).then(r => {
-            return r.json();
-        }).then(d => {
-            console.log(d);
-            setIsLoading(false);
-            history.push(`/blog/${d.id}`);
-        }).catch(e => {
-            console.log(e);
-            setIsLoading(false);
-        });
+        dispatch(createData({blog, id}));
+        
+        history.push("/");
     }
 
     return (
@@ -65,7 +50,7 @@ const Create = () => {
                     <option value="luigi">luigi</option>
                 </select>
                 {
-                    !isLoading ? <button>Add blog</button> : <button disabled>Saving blog ...</button>
+                    !isCreateLoading ? <button>Add blog</button> : <button disabled>Saving blog ...</button>
                 }
 
             </form>

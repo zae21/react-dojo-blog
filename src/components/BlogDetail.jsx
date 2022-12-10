@@ -1,24 +1,23 @@
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useHistory, useParams } from "react-router-dom";
-import useFetch from "../hooks/useFetch";
+import { fetchData, deleteData } from "../stores/blogs";
 
 const BlogDetail = () => {
 
     const { id } = useParams();
-    const { isLoading, data: blog, isError } = useFetch(`http://localhost:8000/blogs/${id}`);
+    const { isLoading, blogs: blog, isError } = useSelector((state) => state.blogs);
     const history = useHistory();
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(fetchData(id));
+    }, [dispatch]);
+
 
     const onDeleteHandle = () => {
-        fetch(`http://localhost:8000/blogs/${id}`, { method: "DELETE" })
-            .then(r => {
-                return r.json();
-            })
-            .then(d => {
-                console.log(d);
-                history.push('/');
-            })
-            .catch(e => {
-                console.log(e);
-            });
+        dispatch(deleteData(id));
+        history.push('/');
     }
 
     return (

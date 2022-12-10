@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
     isLoading: true,
@@ -6,30 +6,61 @@ const initialState = {
     blogs: null,
 }
 
-export const blogSlice = createSlice({
-    name: 'blog',
-    initialState,
-    reducers: {
-        fetchData: async (state, actions) => {
-            const abortCont = new AbortController();
-            const url = actions.payload.url;
+export const fetchData = createAsyncThunk("blog/fetchData", async (id=null) => {
+    const res = await fetch(`http://localhost:8000/blogs${id ? "/" + id : ""}`);
+    return await res.json();
+});
 
-            const res = await fetch(url);
-            const data = await res.json();
-            state.blogs = data;
-            state.isLoading = false;
-                
-        },
-        createData: (state) => {
-        },
-        updateData: (state) => {
-        },
-        deleteData: (state) => {
+export const createData = createAsyncThunk("blog/createData", async ({blog,id=null}) => {
+    const res = await fetch(`http://localhost:8000/blogs${(id && id !== undefined) ? "/" + id : ""}`, {
+        method: (id && id !== undefined) ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(blog)
+    })
+    return await res.json();
+});
+export const deleteData = createAsyncThunk("blog/deleteData", async (id=null) => {
+    const res = await fetch(`http://localhost:8000/blogs/${id}`, { method : "DELETE" });
+    return await res.json();
+});
+
+export const blogSlice = createSlice({
+    name: 'blogs',
+    initialState,
+    reducers:{
+        setIsLoading: (state, action) => {
+            state.isLoading = action.payload
         }
+    },
+    extraReducers: (builder) => {
+        builder.addCase(fetchData.pending, (state, action) => {
+            state.isLoading = true;
+        });
+        builder.addCase(fetchData.fulfilled, (state, action) => {
+            state.blogs = action.payload;
+            state.isLoading = false;
+        });
+        builder.addCase(fetchData.rejected, (state, action) => {
+            state.error = action.error.message;
+            state.isLoading = false;
+        });
+        builder.addCase(createData.pending, (state, action) => {
+            state.isLoading = false;
+        });
+        builder.addCase(createData.fulfilled, (state, action) => {
+            state.blogs = action.payload;
+            state.isLoading = false;
+        });
+        builder.addCase(deleteData.pending, (state, action) => {
+            state.isLoading = false;
+        });
+        builder.addCase(deleteData.fulfilled, (state, action) => {
+            state.blogs = action.payload;
+            state.isLoading = false;
+        });
     },
 })
 
-// Action creators are generated for each case reducer function
-export const { fetchData, createData, updateData, deleteData } = blogSlice.actions
+export const { setIsLoading }  = blogSlice.actions;
 
-export default blogSlice.reducer
+export default blogSlice.reducer;
